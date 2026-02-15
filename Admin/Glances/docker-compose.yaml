@@ -1,0 +1,37 @@
+services:
+  glances:
+    container_name: glances
+    image: nicolargo/glances:ubuntu-latest-full
+    pid: host
+    environment:
+      - TZ=Europe/Dublin
+      - GLANCES_OPT=-C /glances/conf/glances.conf -w
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/tank/docker/admin/glances/glances.conf:/glances/conf/glances.conf
+    networks:
+      - proxy
+    ports:
+      - 61208:61208
+    dns:
+      - 172.17.0.2
+    labels:
+      #- diun.enable=true
+      #- tsdproxy.enable=true
+      #- tsdproxy.name=glances
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.glances.entrypoints=http
+      - traefik.http.routers.glances.rule=Host(`glances.ziejacode`)
+      - traefik.http.middlewares.dozzle-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.dozzle.middlewares=dozzle-https-redirect
+      - traefik.http.routers.dozzle-secure.entrypoints=https
+      - traefik.http.routers.dozzle-secure.rule=Host(`dozzle.ziejacode.com`)
+      - traefik.http.routers.glances.tls=true
+      - traefik.http.routers.glances-secure.service=glances
+      - traefik.http.services.glances.loadbalancer.server.port=61208
+      - traefik.http.routers.glances-secure.middlewares=authelia@docker
+    restart: unless-stopped
+
+networks:
+  proxy:
