@@ -1,0 +1,39 @@
+services:
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    environment:
+      - DOZZLE_ADDR=:8080
+      - DOZZLE_LEVEL=info
+      - DOZZLE_NO_ANALYTICS=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - proxy
+    ports:
+      - 31016:8080
+    dns:
+      - 172.17.0.2
+    labels:
+      #- diun.enable=true
+      #- tsdproxy.enable=true
+      #- tsdproxy.name=dozzle
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.dozzle.entrypoints=http
+      - traefik.http.routers.dozzle.rule=Host(`dozzle.ziejacode.com`)
+      - "traefik.http.routers.dozzle.middlewares=default-whitelist@file"
+      - "traefik.http.middlewares.dozzle-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.dozzle.middlewares=dozzle-https-redirect"
+      - "traefik.http.middlewares.dozzle-http-redirect.redirectscheme.scheme=http"
+      - "traefik.http.routers.dozzle.middlewares=dozzle-http-redirect"
+      - "traefik.http.routers.dozzle-secure.entrypoints=https"
+      - "traefik.http.routers.dozzle-secure.rule=Host(`dozzle.ziejacode.com`)"
+      - "traefik.http.routers.dozzlee-secure.tls=true"
+      - "traefik.http.routers.dozzle-secure.service=dozzle"
+      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true  
