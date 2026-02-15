@@ -29,7 +29,7 @@ services:
       #- "traefik.http.routers.dozzle.middlewares=dozzle-http-redirect"
       - "traefik.http.routers.dozzle-secure.entrypoints=https"
       - "traefik.http.routers.dozzle-secure.rule=Host(`dozzle.ziejacode.com`)"
-      - "traefik.http.routers.dozzlee-secure.tls=true"
+      - "traefik.http.routers.dozzle-secure.tls=true"
       - "traefik.http.routers.dozzle-secure.service=dozzle"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
       - "traefik.http.routers.dozzle-secure.middlewares=authelia@docker"
