@@ -23,10 +23,10 @@ services:
       - traefik.docker.network=proxy
       - traefik.http.routers.glances.entrypoints=http
       - traefik.http.routers.glances.rule=Host(`glances.ziejacode`)
-      - traefik.http.middlewares.dozzle-https-redirect.redirectscheme.scheme=https
-      - traefik.http.routers.dozzle.middlewares=dozzle-https-redirect
-      - traefik.http.routers.dozzle-secure.entrypoints=https
-      - traefik.http.routers.dozzle-secure.rule=Host(`dozzle.ziejacode.com`)
+      - traefik.http.middlewares.glances-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.glances.middlewares=glances-https-redirect
+      - traefik.http.routers.glances-secure.entrypoints=https
+      - traefik.http.routers.glances-secure.rule=Host(`glances.ziejacode.com`)
       - traefik.http.routers.glances.tls=true
       - traefik.http.routers.glances-secure.service=glances
       - traefik.http.services.glances.loadbalancer.server.port=61208
