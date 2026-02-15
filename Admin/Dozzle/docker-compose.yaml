@@ -18,20 +18,21 @@ services:
       #- diun.enable=true
       #- tsdproxy.enable=true
       #- tsdproxy.name=dozzle
-      - traefik.enable=true
-      - traefik.docker.network=proxy
-      - traefik.http.routers.dozzle.entrypoints=http
-      - traefik.http.routers.dozzle.rule=Host(`dozzle.ziejacode.com`)
-      - "traefik.http.routers.dozzle.middlewares=default-whitelist@file"
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.dozzle.entrypoints=http"
+      - "traefik.http.routers.dozzle.rule=Host(`dozzle.ziejacode.com`)"
+      #- "traefik.http.routers.dozzle.middlewares=default-whitelist@file"
       - "traefik.http.middlewares.dozzle-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.dozzle.middlewares=dozzle-https-redirect"
-      - "traefik.http.middlewares.dozzle-http-redirect.redirectscheme.scheme=http"
-      - "traefik.http.routers.dozzle.middlewares=dozzle-http-redirect"
+      #- "traefik.http.middlewares.dozzle-http-redirect.redirectscheme.scheme=http"
+      #- "traefik.http.routers.dozzle.middlewares=dozzle-http-redirect"
       - "traefik.http.routers.dozzle-secure.entrypoints=https"
       - "traefik.http.routers.dozzle-secure.rule=Host(`dozzle.ziejacode.com`)"
       - "traefik.http.routers.dozzlee-secure.tls=true"
       - "traefik.http.routers.dozzle-secure.service=dozzle"
-      - traefik.http.services.dozzle.loadbalancer.server.port=8080
+      - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
+      - "traefik.http.routers.dozzle-secure.middlewares=authelia@docker"
     restart: unless-stopped
 
 networks:
