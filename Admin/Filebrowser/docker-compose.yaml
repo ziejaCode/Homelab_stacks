@@ -1,0 +1,43 @@
+services: 
+  file-browser:
+    container_name: file-browser
+    image: filebrowser/filebrowser
+    user: 3000:3000
+    #environment:
+    #  - TZ=Europe/Dublin
+    #  - PUID=3000
+    #  - PGID=3000
+    volumes:
+      - /mnt/tank:/srv
+      - /mnt/morpheus:/srv
+      - /mnt/tank/docker/admin/filebrowser/database/filebrowser.db:/database.db
+      #- /mnt/tank/docker/admin/filebrowser/config/.filebrowser.json:/.filebrowser.json
+    networks:
+      - proxy
+    ports:
+      - 31017:80
+    #dns:
+    #  - 172.17.0.2
+    labels:
+      #- diun.enable=true
+      #- tsdproxy.enable=true
+      #- tsdproxy.name=filebrowser
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.filebrowser.entrypoints=http"
+      - "traefik.http.routers.filebrowser.rule=Host(`filebrowser.ziejacode.com`)"
+      - "traefik.http.middlewares.filebrowser-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.filebrowser.middlewares=filebrowser-https-redirect"
+      - "traefik.http.routers.filebrowser-secure.entrypoints=https"
+      - "traefik.http.routers.filebrowser-secure.rule=Host(`filebrowser.ziejacode.com`)"
+      - "traefik.http.routers.filebrowser-secure.tls=true"
+      - "traefik.http.routers.filebrowser-secure.service=filebrowser"
+      - "traefik.http.services.filebrowser.loadbalancer.server.port=8080"
+      - "traefik.http.routers.filebrowser-secure.middlewares=authelia@docker"
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  proxy:
+    external: true  

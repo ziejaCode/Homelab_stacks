@@ -22,7 +22,6 @@ services:
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.dozzle.entrypoints=http"
       - "traefik.http.routers.dozzle.rule=Host(`dozzle.ziejacode.com`)"
-      #- "traefik.http.routers.dozzle.middlewares=default-whitelist@file"
       - "traefik.http.middlewares.dozzle-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.routers.dozzle.middlewares=dozzle-https-redirect"
       #- "traefik.http.middlewares.dozzle-http-redirect.redirectscheme.scheme=http"

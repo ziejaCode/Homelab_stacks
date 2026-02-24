@@ -16,22 +16,20 @@ services:
     dns:
       - 172.17.0.2
     labels:
-      #- diun.enable=true
-      #- tsdproxy.enable=true
-      #- tsdproxy.name=glances
-      - traefik.enable=true
-      - traefik.docker.network=proxy
-      - traefik.http.routers.glances.entrypoints=http
-      - traefik.http.routers.glances.rule=Host(`glances.ziejacode`)
-      - traefik.http.middlewares.glances-https-redirect.redirectscheme.scheme=https
-      - traefik.http.routers.glances.middlewares=glances-https-redirect
-      - traefik.http.routers.glances-secure.entrypoints=https
-      - traefik.http.routers.glances-secure.rule=Host(`glances.ziejacode.com`)
-      - traefik.http.routers.glances.tls=true
-      - traefik.http.routers.glances-secure.service=glances
-      - traefik.http.services.glances.loadbalancer.server.port=61208
-      - traefik.http.routers.glances-secure.middlewares=authelia@docker
-    restart: unless-stopped
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.glances.entrypoints=http"
+      - "traefik.http.routers.glances.rule=Host(`glances.ziejacode.com`)"
+      - "traefik.http.middlewares.glances-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.glances.middlewares=glances-https-redirect"
+      - "traefik.http.routers.glances-secure.entrypoints=https"
+      - "traefik.http.routers.glances-secure.rule=Host(`glances.ziejacode.com`)"
+      - "traefik.http.routers.glances-secure.tls=true"
+      - "traefik.http.routers.glances-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.glances-secure.service=glances"
+      - "traefik.http.services.glances.loadbalancer.server.port=80"
+      - "traefik.http.routers.glances-secure.middlewares=authelia@docker"
 
 networks:
   proxy:
+    external: true
