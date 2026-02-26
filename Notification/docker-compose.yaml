@@ -1,0 +1,95 @@
+
+####################################################################################################
+# Stack name: NOTIFICATIONS
+
+services:
+
+####################################################################################################
+# GOTIFY | URL: https://gotify.net
+
+
+ gotify:
+    container_name: gotify
+    image: gotify/server:latest
+    environment:
+      - TZ=Europe/Dublin
+    volumes:
+      - /mnt/tank/docker/notifications/gotify:/app/data
+    networks:
+      proxy:
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 31015:80
+    labels:
+      - "diun.enable=true"
+      - "tsdproxy.enable=true"
+      - "tsdproxy.name=gotify"
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.gotify.entrypoints=http"
+      - "traefik.http.routers.gotify.rule=Host(`gotify.ziejacode.com`)"
+      - "traefik.http.middlewares.gotify-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.gotify.middlewares=gotify-https-redirect"
+      - "traefik.http.routers.gotify-secure.entrypoints=https"
+      - "traefik.http.routers.gotify-secure.rule=Host(`gotify.ziejacode.com`)"
+      - "traefik.http.routers.gotify-secure.tls=true"
+      - "traefik.http.routers.gotify-secure.service=gotify"
+      - "traefik.http.services.gotify.loadbalancer.server.port=80"
+      #- "traefik.http.routers.gotify-secure.middlewares=authelia@docker"
+    restart: unless-stopped
+
+####################################################################################################
+# TRUENAS GOTIFY ADAPTER 
+
+
+
+ gotify-truenas-adapter:
+   container_name: gotify-truenas
+   image: ghcr.io/ztube/truenas-gotify-adapter:main
+   environment:
+     - GOTIFY_URL=https://gotify.ziejacode.com
+     - GOTIFY_TOKEN=AJhaGFFv0Q46gbh
+   network_mode: host
+   labels:
+     - diun.enable=true
+     - tsdproxy.enable=false
+     - traefik.enable=false
+   restart: unless-stopped
+
+####################################################################################################
+# DOCKER IMAGE UPDATE NOTIFIER | URL: https://crazymax.dev/diun
+
+
+ diun:
+   container_name: diun
+   image: crazymax/diun:latest
+   command: serve
+   environment:
+     - "TZ=Europe/Dublin"
+     - "LOG_LEVEL=info"
+     - "DIUN_WATCH_WORKERS=20"
+     - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+     - "DIUN_WATCH_JITTER=30s"
+     - "DIUN_WATCH_RUNONSTARTUP=true"
+     - "DIUN_PROVIDERS_DOCKER=true"
+     - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+     - "DIUN_NOTIF_GOTIFY_ENDPOINT=https://gotify.ziejacode.com"
+     - "DIUN_NOTIF_GOTIFY_TOKEN=Asu.6CWWYoCN6nN" 
+     - "DIUN_NOTIF_GOTIFY_PRIORITY=1"
+     - "DIUN_NOTIF_GOTIFY_TIMEOUT=10s"
+   volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /mnt/tank/docker/notifications/diun:/data
+   network_mode: host
+   labels:
+     - diun.enable=true
+   restart: unless-stopped
+
+####################################################################################################
+# NETWORKS
+
+
+networks:
+  proxy:
+    external: true

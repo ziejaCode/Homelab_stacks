@@ -15,9 +15,9 @@ services:
     dns:
       - 172.17.0.2
     labels:
-      #- diun.enable=true
-      #- tsdproxy.enable=true
-      #- tsdproxy.name=dozzle
+      - diun.enable=true
+      - tsdproxy.enable=true
+      - tsdproxy.name=dozzle
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.dozzle.entrypoints=http"
