@@ -2,6 +2,8 @@ services:
   file-browser:
     container_name: file-browser
     image: filebrowser/filebrowser
+    healthcheck:
+      test: curl -f http://localhost:8080/ || exit 1
     user: 3000:3000
     #environment:
     #  - TZ=Europe/Dublin
@@ -10,18 +12,14 @@ services:
     volumes:
       - /mnt/tank:/srv
       - /mnt/morpheus:/srv
-      - /mnt/tank/docker/admin/filebrowser/database/filebrowser.db:/database.db
-      #- /mnt/tank/docker/admin/filebrowser/config/.filebrowser.json:/.filebrowser.json
+      - /mnt/tank/docker/admin/filebrowser/database/filebrowser.db:/database/filebrowser.db:rw
+      - /mnt/tank/docker/admin/filebrowser/config/settings.json:/config/settings.json
     networks:
       - proxy
     ports:
-      - 31017:80
-    #dns:
-    #  - 172.17.0.2
+      - 31017:8080
     labels:
-      #- diun.enable=true
-      #- tsdproxy.enable=true
-      #- tsdproxy.name=filebrowser
+      - "diun.enable=true"
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.filebrowser.entrypoints=http"
