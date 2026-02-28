@@ -36,7 +36,7 @@ services:
       - "traefik.http.routers.gotify-secure.tls=true"
       - "traefik.http.routers.gotify-secure.service=gotify"
       - "traefik.http.services.gotify.loadbalancer.server.port=80"
-      #- "traefik.http.routers.gotify-secure.middlewares=authelia@docker"
+      - "traefik.http.routers.gotify-secure.middlewares=authelia@docker"
     restart: unless-stopped
 
 ####################################################################################################
