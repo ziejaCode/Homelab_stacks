@@ -1,18 +1,39 @@
 services:
-  nextcloud:
-    image: nextcloud/all-in-one:latest
-    container_name: nextcloud-aio-mastercontainer
+ nextcloud:
+   image: lscr.io/linuxserver/nextcloud:latest
+   container_name: nextcloud
+   environment:
+     - PUID=568
+     - PGID=568
+     - TZ=Europe/Dublin
+   volumes:
+     - /mnt/tank/docker/nextcloud/data:/data
+     - /mnt/tank/docker/nextcloud/config:/config
+     #- /var/run/docker.sock:/var/run/docker.sock:ro
+   ports:
+      - 8887:443
+   restart: unless-stopped
+ collabora:
+    image: collabora/code
+    container_name: collabora
     restart: unless-stopped
-    volumes:
-      - /mnt/tank/docker/nextcloud:/mnt/docker-aio-config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - 8080:8080
+      - 9980:9980
     environment:
-      - APACHE_PORT=11000
-      - NEXTCLOUD_DATADIR=/mnt/tank/docker/nextcloud/data # Allows to set the host directory for Nextcloud's datadir. See https://github.com/nextcloud/all-in-one#how-to-change-the-default-location-of-nextclouds-datadir
-      - NEXTCLOUD_MOUNT=/mnt/tank/docker/nextcloud # Allows the Nextcloud container to access the chosen directory on the host. See https://github.com/nextcloud/all-in-one#how-to-allow-the-nextcloud-container-to-access-directories-on-the-host
-      - NEXTCLOUD_MEMORY_LIMIT=4096M
+      - TZ=Europe/Dublin
+      - domain=nextcloud\\.ziejacode\\.com
+      - server_name=collabora.ziejacode.com
+      - username=marty
+      - password=browarek25101
+    volumes:
+      - /mnt/tank/docker/collabora:/data   #environment:
+      # - APACHE_PORT=11000
+      #- NEXTCLOUD_DATADIR=/mnt/tank/docker/nextcloud/data # Allows to set the host directory for Nextcloud's datadir. See https://github.com/nextcloud/all-in-one#how-to-change-the-default-location-of-nextclouds-datadir
+      #- NEXTCLOUD_MOUNT=/mnt/tank/docker/nextcloud # Allows the Nextcloud container to access the chosen directory on the host. See https://github.com/nextcloud/all-in-one#how-to-allow-the-nextcloud-container-to-access-directories-on-the-host
+
+
+
+
 networks:
   proxy:
     external: true
