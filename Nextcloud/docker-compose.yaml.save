@@ -1,0 +1,78 @@
+services:
+ nextcloud:
+   image: lscr.io/linuxserver/nextcloud:latest
+   container_name: nextcloud
+   environment:
+     - PUID=568
+     - PGID=568
+     - TZ=Europe/Dublin
+   volumes:
+     - /mnt/tank/docker/nextcloud/data:/data
+     - /mnt/tank/docker/nextcloud/config:/config
+     #- /var/run/docker.sock:/var/run/docker.sock:ro
+   #ports:
+    #  - 8887:443
+   restart: unless-stopped
+   labels:
+    #  - diun.enable=true
+     # - tsdproxy.enable=true
+      #- tsdproxy.name=nextcloud
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.nextcloud.entrypoints=http"
+      - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.ziejacode.com`)"
+      - "traefik.http.middlewares.nextcloud-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.nextcloud.middlewares=nextcloud-https-redirect"
+      - "traefik.http.routers.nextcloud-secure.entrypoints=https"
+      - "traefik.http.routers.nextcloud-secure.rule=Host(`nextcloud.ziejacode.com`)"
+      - "traefik.http.routers.nextcloud-secure.tls=true"
+      - "traefik.http.routers.nextcloud-secure.service=nextcloud"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      #- "traefik.http.routers.nextcloud-secure.middlewares=authelia@docker"
+   networks:
+      proxy:
+
+ collabora:
+    image: collabora/code
+    container_name: collabora
+    restart: unless-stopped
+    ports:
+      - 9980:9980
+    environment:
+      - TZ=Europe/Dublin
+      - DONT_GEN_SSL_CERT=true
+      - domain=nextcloud\\.ziejacode\\.com
+      - cert_domain=collabora.ziejacode.com
+      - server_name=collabora.ziejacode.com
+      - username=marty
+      - password=browarek25101
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+    volumes:
+      - /mnt/tank/docker/collabora/coolwsd.xml:/data
+      #environment:
+      # - APACHE_PORT=11000
+      #- NEXTCLOUD_DATADIR=/mnt/tank/docker/nextcloud/data # Allows to set the host directory for Nextcloud's datadir. See https://github.com/nextcloud/all-in-one#how-to-change-the-default-location-of-nextclouds-datadir
+      #- NEXTCLOUD_MOUNT=/mnt/tank/docker/nextcloud # Allows the Nextcloud container to access the chosen directory on the host. See https://github.com/nextcloud/all-in-one#how-to-allow-the-nextcloud-container-to-access-directories-on-the-host
+    labels:
+      #- diun.enable=true
+      #- tsdproxy.enable=true
+      #- tsdproxy.name=collabora
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.collabora.entrypoints=http"
+      - "traefik.http.routers.collabora.rule=Host(`collabora.ziejacode.com`)"
+      - "traefik.http.middlewares.collabora-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.collabora.middlewares=collabora-https-redirect"
+      - "traefik.http.routers.collabora-secure.entrypoints=https"
+      - "traefik.http.routers.collabora-secure.rule=Host(`collabora.ziejacode.com`)"
+      - "traefik.http.routers.collabora-secure.tls=true"
+      - "traefik.http.routers.collabora-secure.service=collabora"
+      - "traefik.http.services.collabora.loadbalancer.server.port=80"
+      #- "traefik.http.routers.collabora-secure.middlewares=authelia@docker"
+    networks:
+      proxy:
+
+
+networks:
+  proxy:
+    external: true
