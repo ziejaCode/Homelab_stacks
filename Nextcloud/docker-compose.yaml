@@ -11,7 +11,7 @@ services:
 
     environment:
       APACHE_PORT: 11000
-      #APACHE_ADDITIONAL_NETWORK: traefik_proxy
+      APACHE_ADDITIONAL_NETWORK: proxy
       # OPTIONAL:
       NEXTCLOUD_DATADIR: /mnt/tank/nextcloud_aio
       # NEXTCLOUD_MOUNT: /mnt/
@@ -21,6 +21,7 @@ services:
       - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
+      - default
       - proxy
 
 volumes:
