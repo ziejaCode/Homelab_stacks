@@ -1,0 +1,38 @@
+services:
+  ubooquity:
+    image: ghcr.io/linuxserver/ubooquity:latest
+    container_name: ubooquity
+    restart: unless-stopped
+    environment:
+      - PUID=3000
+      - PGID=3000
+      - TZ=Europe/Dublin
+      - MAXMEM=1024
+    volumes:
+      - /home/marty/ubooquity/data:/config
+      - /mnt/morpheus/Media/FictionBooks:/books
+      - /mnt/morpheus/Media/Comics:/comics
+      - /mnt/morpheus/Media/StudyBooks:/files
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # Main Ubooquity library
+      - "traefik.http.routers.ubooquity.rule=Host(`ubooquity.ziejacode.com`)"
+      - "traefik.http.routers.ubooquity.entrypoints=https"
+      - "traefik.http.routers.ubooquity.tls=true"
+      - "traefik.http.routers.ubooquity.tls.certresolver=cloudflare"
+      - "traefik.http.services.ubooquity.loadbalancer.server.port=2202"
+
+      # Ubooquity admin
+      - "traefik.http.routers.ubooquity-admin.rule=Host(`ubooquity-admin.ziejacode.com`)"
+      - "traefik.http.routers.ubooquity-admin.entrypoints=https"
+      - "traefik.http.routers.ubooquity-admin.tls=true"
+      - "traefik.http.routers.ubooquity-admin.tls.certresolver=cloudflare"
+      - "traefik.http.services.ubooquity-admin.loadbalancer.server.port=2203"
+
+networks:
+  proxy:
+    external: true
